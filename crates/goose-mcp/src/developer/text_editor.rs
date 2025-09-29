@@ -188,22 +188,16 @@ fn generate_summary(results: &DiffResults, is_single_file: bool, base_path: &Pat
     ]
 }
 
-/// Adjusts the base directory to handle overlapping paths between base_dir and file_path
 fn adjust_base_dir_for_overlap(base_dir: &Path, file_path: &Path) -> PathBuf {
-    // Find the overlapping path: longest suffix of base_dir that is prefix of file_path
     let base_components: Vec<_> = base_dir.components().collect();
     let file_components: Vec<_> = file_path.components().collect();
 
-    // Find the maximum k where base_components[(len-k)..] == file_components[0..k]
-    let mut max_k = 0;
-    for k in 1..=(base_components.len().min(file_components.len())) {
-        if &file_components[0..k] == &base_components[(base_components.len() - k)..] {
-            max_k = k;
-        }
-    }
+    let min_len = base_components.len().min(file_components.len());
+    let max_k = (1..=min_len)
+        .rfind(|&k| file_components[0..k] == base_components[base_components.len() - k..])
+        .unwrap_or(0);
 
     if max_k > 0 {
-        // Remove the last max_k components from base_dir
         let adjusted_components = base_components[..base_components.len() - max_k].to_vec();
         PathBuf::from_iter(adjusted_components)
     } else {
