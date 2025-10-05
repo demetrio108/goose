@@ -569,7 +569,6 @@ impl DeveloperServer {
         }
     }
 
-    #[cfg(not(target_os = "android"))]
     /// List all available windows that can be used with screen_capture.
     /// Returns a list of window titles that can be used with the window_title parameter
     /// of the screen_capture tool.
@@ -586,10 +585,8 @@ impl DeveloperServer {
             )
         })?;
 
-        let window_titles: Vec<String> = windows
-            .into_iter()
-            .filter_map(|w| w.title().ok())
-            .collect();
+        let window_titles: Vec<String> =
+            windows.into_iter().filter_map(|w| w.title().ok()).collect();
 
         let content_text = format!("Available windows:\n{}", window_titles.join("\n"));
 
@@ -601,7 +598,6 @@ impl DeveloperServer {
         ]))
     }
 
-    #[cfg(not(target_os = "android"))]
     /// Capture a screenshot of a specified display or window.
     /// You can capture either:
     /// 1. A full display (monitor) using the display parameter
